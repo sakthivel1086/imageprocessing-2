@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Technician Image Validator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    #drop-zone {
+      border: 2px dashed #ccc;
+      padding: 20px;
+      text-align: center;
+      color: #888;
+      margin-top: 10px;
+    }
+
+    #drop-zone.dragover {
+      border-color: #007bff;
+      background-color: #f0f8ff;
+    }
+
+    #preview {
+      margin-top: 20px;
+      max-width: 100%;
+      height: auto;
+      display: none;
+      border: 1px solid #ccc;
+    }
+
+    #result {
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Technician Image Compliance Validator</h2>
+
+  <label for="imageType">Select Image Type:</label>
+  <select id="imageType">
+    <option value="">--Choose--</option>
+    <option value="grill">Grill Temperature</option>
+    <option value="piping">Piping Image</option>
+    <option value="st_idu">ST Photo in front of IDU</option>
+    <option value="odu">ODU Installed Image</option>
+    <option value="sr_no">IDU & ODU SR No</option>
+  </select>
+
+  <div id="drop-zone">
+    Drag & Drop Image Here or <br/>
+    <input type="file" id="imgInput" accept="image/*"/>
+  </div>
+
+  <img id="preview" src="#" alt="Image Preview"/>
+
+  <br/>
+  <button onclick="validateImage()">Validate Image</button>
+  <p id="result"></p>
+
+  <script>
+    const imgInput = document.getElementById('imgInput');
+    const dropZone = document.getElementById('drop-zone');
+    const preview = document.getElementById('preview');
+    let selectedFile = null;
+
+    // Drag and drop functionality
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      handleImage(file);
+    });
+
+    imgInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      handleImage(file);
+    });
+
+    function handleImage(file) {
+      if (!file.type.startsWith('image/')) {
+        alert("Please upload a valid image.");
+        return;
+      }
+
+      selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function validateImage() {
+      const imageType = document.getElementById('imageType').value;
+      const result = document.getElementById('result');
+
+      if (!selectedFile || !imageType) {
+        result.textContent = "Please select an image type and upload an image.";
+        return;
+      }
+
+      // Simulated validations (based on your logic)
+      const complianceResults = {
+        grill: "Rejected: Multiple objects found. Upload only the grill temp display.",
+        piping: "Accepted: Copper pipe & brick background clearly visible.",
+        st_idu: "Rejected: Taken from an odd angle or too far. Please retake.",
+        odu: "Rejected: ODU image not properly aligned or 50% visible.",
+        sr_no: "Accepted: SR number visible, centered, and sharp."
+      };
+
+      result.textContent = complianceResults[imageType];
+    }
+  </script>
+</body>
+</html>
